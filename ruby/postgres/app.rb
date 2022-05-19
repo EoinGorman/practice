@@ -23,11 +23,15 @@ class App
     @conn.exec("INSERT INTO users (username, password, created_at) VALUES('#{username}', '#{password}', NOW())")
   end
 
-  def display_tables
+  def display_users
     result = @conn.exec('SELECT * FROM users')
     result.each do |res|
       puts "#{res.class} : #{res}"
     end
+  end
+
+  def update_user_password(user, new_password)
+    @conn.exec("UPDATE users SET password = '#{new_password}' WHERE username = '#{user}'")
   end
 end
 
@@ -35,8 +39,9 @@ if __FILE__ == $PROGRAM_NAME
   begin
     app = App.new
     app.connect
-    app.display_tables
+    app.display_users
     #app.create_user
+    app.update_user_password('Bond', 'newpass')
   rescue PG::Error => e
     puts "#{e.message}"
   ensure
