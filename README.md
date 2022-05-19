@@ -1,2 +1,2 @@
 # practice
-Small practice projects 
+Small practice projects / scripts, divided by primary language used.
