@@ -1,4 +1,6 @@
+require 'csv'
 require 'thread'
+require 'net/http'
 
 module FibUtils
   def fib(index)
@@ -15,12 +17,29 @@ module FileReadUtils
     output = File.read(file_name)
     puts "finished reading"
   end
+
+  def read_csv()
+    file_name = 'websites_to_visit.csv'
+    CSV.read(file_name, headers: true)
+  end
+end
+
+module HttpUtils
+  include FileReadUtils
+
+  def get_urls
+    rows = read_csv
+    rows.each do |row|
+      response = Net::HTTP.get_response(URI(row[1]))
+    end
+  end
 end
 
 # Main class
 class App
   include FibUtils
   include FileReadUtils
+  include HttpUtils
 
   def initialize(run_count)
     @run_count = run_count
@@ -97,8 +116,9 @@ class App
   end
 
   def test_case(args)
-    fib(args[0])
+    #fib(args[0])
     #read_file
+    get_urls
   end
 
   def output_seperator
