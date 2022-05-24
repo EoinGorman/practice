@@ -1,7 +1,7 @@
 require 'thread'
 
 module FibUtils
-  def self.fib(index)
+  def fib(index)
     return index if index < 2
     return 1 if index == 2
 
@@ -9,16 +9,25 @@ module FibUtils
   end
 end
 
+module FileReadUtils
+  def read_file()
+    file_name = 'really_big_text_file.txt'
+    output = File.read(file_name)
+    puts "finished reading"
+  end
+end
+
 # Main class
 class App
   include FibUtils
+  include FileReadUtils
 
-  def initialize(run_count, num_to_find)
+  def initialize(run_count)
     @run_count = run_count
-    @num_to_find = num_to_find
   end
 
-  def run
+  def run(*args)
+    @args = *args
     output_seperator
     puts "Running with single process"
     single_process
@@ -39,7 +48,7 @@ class App
     t1 = Time.now
 
     @run_count.times do
-      test_case
+      test_case(@args)
     end
 
     t2 = Time.now
@@ -52,7 +61,7 @@ class App
     threads = []
     @run_count.times do
       t = Thread.new do
-        test_case
+        test_case(@args)
       end
       threads << t
       t.run
@@ -73,7 +82,7 @@ class App
     pids = []
     @run_count.times do
       pid = Process.fork do
-        test_case
+        test_case(@args)
       end
       pids << pid
     end
@@ -87,8 +96,9 @@ class App
     puts "#{__method__} Time taken: #{time_taken}"
   end
 
-  def test_case
-    FibUtils.fib(@num_to_find)
+  def test_case(args)
+    fib(args[0])
+    #read_file
   end
 
   def output_seperator
@@ -96,5 +106,6 @@ class App
   end
 end
 
-app = App.new(5, 35)
-app.run
+app = App.new(5)
+#app.run(35) # FibUtils test
+app.run()
